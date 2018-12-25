@@ -7,7 +7,7 @@ import os
 
 class App:  
 	def __init__(self, master):
-		self.image_data = np.zeros(3)
+		self.image_data = np.array([])
 
 		master_frame = Frame(master, borderwidth=2)
 		master_frame.pack(fill=BOTH, expand=1)
@@ -18,20 +18,25 @@ class App:
 		filemenu = Menu(menubar, tearoff=0)
 		filemenu.add_command(label="Save ...", command=self.saveFile)
 		filemenu.add_command(label="Open ...", command=self.openFile)
-		filemenu.add_command(label="Exit", command=master.quit) 
+		filemenu.add_command(label="Exit", command=master.destroy) 
 		menubar.add_cascade(label="File", menu=filemenu)
 		
 		''' TRANSFORM MENU BAR '''
 		transformmenu = Menu(menubar, tearoff=0)
+		
+		''' ROTATE TRANSFORM '''
 		rotatemenu = Menu(transformmenu, tearoff=0)
-
-		rotatemenu.add_command(label="Rotate 90 clockwise", command=master.quit)
-		rotatemenu.add_command(label="Rotate 90 counter-clockwise", command=master.quit)
+		rotatemenu.add_command(label="Rotate 90 clockwise", command=self.rotateRight)
+		rotatemenu.add_command(label="Rotate 90 counter-clockwise", command=self.rotateLeft)
 		transformmenu.add_cascade(label="Rotate", menu=rotatemenu)
 
-		transformmenu.add_command(label="Flip", command=master.quit)
-		menubar.add_cascade(label="Transform", menu=transformmenu)
+		''' FLIP TRANSFORM '''
+		flipmenu = Menu(transformmenu, tearoff=0)
+		flipmenu.add_command(label="Flip Horizontally", command=self.flitHoriz)
+		flipmenu.add_command(label="Flip Vertically", command=self.flitVert)
+		transformmenu.add_cascade(label="Flip", menu=flipmenu)
 
+		menubar.add_cascade(label="Transform", menu=transformmenu)
 		master.config(menu=menubar)
 
 		btn_frame = Frame(master_frame, relief=SUNKEN, borderwidth=2)
@@ -59,17 +64,17 @@ class App:
 		label_brightness = Label(
 			frame_brightness, relief=RAISED, padx=5, pady=5, font="Arial 10", text="Brightness"
 		)
-		label_brightness.pack(side=LEFT, padx=5, pady=5)
+		label_brightness.pack(side=LEFT)
 
 		button_brightness_inc = Button(
 			frame_brightness, font="Arial 10", text="+", command=btn_frame.quit
 		)
-		button_brightness_inc.pack(side=RIGHT, padx=1, pady=1)
+		button_brightness_inc.pack(side=RIGHT)
 
 		button_brightness_dec = Button(
 			frame_brightness, font="Arial 10", text="-", command=btn_frame.quit
 		)
-		button_brightness_dec.pack(side=RIGHT, padx=1, pady=1)
+		button_brightness_dec.pack(side=RIGHT)
 
 		''' BUTTON EDGE '''
 		frame_edge = Frame(btn_frame)
@@ -83,7 +88,7 @@ class App:
 		frame_show = Frame(btn_frame)
 		frame_show.pack(fill=Y, expand=1)
 		button_show = Button(
-			frame_show, font="Arial 10", fg='red', text="Show image", command=btn_frame.quit
+			frame_show, font="Arial 10", fg='red', text="Show image", command=self.showImage
 		)		
 		button_show.pack(padx=5, pady=5)
 
@@ -159,16 +164,34 @@ class App:
 		self.label_status.config(text='IMAGE IS SAVE.', fg='green')
 		self.top.destroy()
 
+	def showImage(self):
+		out = Image.fromarray(self.image_data, 'RGB')
+		out.show()
+
+	def rotateRight(self):
+		self.image_data = np.rot90(self.image_data, -1)
+		self.label_status.config(text='IMAGE WAS ROTATED.', fg='green')
+
+	def rotateLeft(self):
+		self.image_data = np.rot90(self.image_data, 1)
+		self.label_status.config(text='IMAGE WAS ROTATED.', fg='green')
+
+	def flitHoriz(self):
+		self.image_data = np.flipud(self.image_data)
+		self.label_status.config(text='IMAGE WAS FLIPED.', fg='green')
+
+	def flitVert(self):
+		self.image_data = np.fliplr(self.image_data)
+		self.label_status.config(text='IMAGE WAS FLIPED.', fg='green')
+
 def main():
 	root = Tk()
 	root.title('Image Editor')
 
 	w = root.winfo_screenwidth()
 	h = root.winfo_screenheight()
-	w = w//2 
-	h = h//2 
-	w = w - 200
-	h = h - 200
+	w = w//2 - 150
+	h = h//2 - 150
 	root.geometry('300x300+{}+{}'.format(w, h))
 	root.resizable(False, False)
 
