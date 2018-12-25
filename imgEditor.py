@@ -16,8 +16,8 @@ class App:
 
 		''' FILE MENU BAR '''
 		filemenu = Menu(menubar, tearoff=0)
-		filemenu.add_command(label="Save ...", command=self.saveFile)
 		filemenu.add_command(label="Open ...", command=self.openFile)
+		filemenu.add_command(label="Save ...", command=self.saveFile)
 		filemenu.add_command(label="Exit", command=master.destroy) 
 		menubar.add_cascade(label="File", menu=filemenu)
 		
@@ -46,7 +46,7 @@ class App:
 		frame_invert = Frame(btn_frame)
 		frame_invert.pack(fill=Y, expand=1)
 		button_invert = Button(
-			frame_invert, font="Arial 10", text="Invert color", command=btn_frame.quit
+			frame_invert, font="Arial 10", text="Invert color", command=self.invert
 		)
 		button_invert.pack(padx=5, pady=5)
 
@@ -54,7 +54,7 @@ class App:
 		frame_grayscale = Frame(btn_frame)
 		frame_grayscale.pack(fill=Y, expand=1)
 		button_grayscale = Button(
-			frame_grayscale, font="Arial 10", text="Grayscale", command=btn_frame.quit
+			frame_grayscale, font="Arial 10", text="Grayscale", command=self.grayScale
 		)
 		button_grayscale.pack(padx=5, pady=5)
 
@@ -65,14 +65,14 @@ class App:
 			frame_brightness, relief=RAISED, padx=5, pady=5, font="Arial 10", text="Brightness"
 		)
 		label_brightness.pack(side=LEFT)
-
+		''' INCREASE '''
 		button_brightness_inc = Button(
-			frame_brightness, font="Arial 10", text="+", command=btn_frame.quit
+			frame_brightness, font="Arial 10", text="+", command=self.brightnessInc
 		)
 		button_brightness_inc.pack(side=RIGHT)
-
+		''' DECREASE '''
 		button_brightness_dec = Button(
-			frame_brightness, font="Arial 10", text="-", command=btn_frame.quit
+			frame_brightness, font="Arial 10", text="-", command=self.brightnessDec
 		)
 		button_brightness_dec.pack(side=RIGHT)
 
@@ -133,7 +133,7 @@ class App:
 			img = Image.open(name)
 			self.image_data = np.asarray(img)
 			img.show()
-			self.label_status.config(text='FILE IS OPEN.', fg='green')
+			self.label_status.config(text='FILE WAS OPENED.', fg='green')
 
 		self.top.destroy()
 
@@ -159,13 +159,20 @@ class App:
 
 	def saveImage(self):
 		name = self.e_save.get()
-		out = Image.fromarray(self.image_data, 'RGB')
+		if self.image_data.ndim is 3:
+			out = Image.fromarray(self.image_data, 'RGB')
+		elif self.image_data.ndim is 2:
+			out = Image.fromarray(self.image_data, 'L')
+
 		out.save(name)
-		self.label_status.config(text='IMAGE IS SAVE.', fg='green')
+		self.label_status.config(text='IMAGE WAS SAVED.', fg='green')
 		self.top.destroy()
 
 	def showImage(self):
-		out = Image.fromarray(self.image_data, 'RGB')
+		if self.image_data.ndim is 3:
+			out = Image.fromarray(self.image_data, 'RGB')
+		elif self.image_data.ndim is 2:
+			out = Image.fromarray(self.image_data, 'L')
 		out.show()
 
 	def rotateRight(self):
@@ -183,6 +190,32 @@ class App:
 	def flitVert(self):
 		self.image_data = np.fliplr(self.image_data)
 		self.label_status.config(text='IMAGE WAS FLIPED.', fg='green')
+
+	def invert(self):
+		self.image_data = 255 - self.image_data
+		self.label_status.config(text='IMAGE WAS INVERTED.', fg='green')
+
+	def grayScale(self):
+		if self.image_data.ndim is 2:
+			return
+
+		gs = ( 0.299, 0.587, 0.114 )* self.image_data
+		gs2 = np.sum( gs, axis=2)
+		self.image_data = (gs2 + 0.5).astype(dtype=np.uint8)
+		self.label_status.config(text='IMAGE WAS CONVERTED TO GRAYSCALE.', fg='green')
+
+	def brightnessDec(self):
+		value = 0.8
+		self.image_data = self.image_data * value
+		self.image_data = (self.image_data + 0.5).astype(dtype=np.uint8)
+		self.label_status.config(text='BRIGHTNESS WAS DECREASED.', fg='green')
+
+	def brightnessInc(self):
+		value = 1.5
+		self.image_data = self.image_data * value + 3
+		self.image_data[ self.image_data > 255 ] = 255
+		self.image_data = (self.image_data - 0.5).astype(dtype=np.uint8)
+		self.label_status.config(text='BRIGHTNESS WAS INCREASED.', fg='green')
 
 def main():
 	root = Tk()
