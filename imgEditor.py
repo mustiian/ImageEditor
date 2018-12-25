@@ -3,15 +3,21 @@
 from tkinter import *
 from PIL import Image
 import numpy as np	
+import os
 
 class App:  
 	def __init__(self, master):
+		self.image_data = np.zeros(3)
+
+		master_frame = Frame(master, borderwidth=2)
+		master_frame.pack(fill=BOTH, expand=1)
+
 		menubar = Menu(master, font="Arial 10")
 
 		''' FILE MENU BAR '''
 		filemenu = Menu(menubar, tearoff=0)
 		filemenu.add_command(label="Save ...", command=master.quit)
-		filemenu.add_command(label="Open ...", command=master.quit)
+		filemenu.add_command(label="Open ...", command=self.openFile)
 		filemenu.add_command(label="Exit", command=master.quit) 
 		menubar.add_cascade(label="File", menu=filemenu)
 		
@@ -27,9 +33,6 @@ class App:
 		menubar.add_cascade(label="Transform", menu=transformmenu)
 
 		master.config(menu=menubar)
-
-		master_frame = Frame(master, borderwidth=2)
-		master_frame.pack(fill=BOTH, expand=1)
 
 		btn_frame = Frame(master_frame, relief=SUNKEN, borderwidth=2)
 		btn_frame.pack(fill=BOTH, expand=1)
@@ -88,23 +91,46 @@ class App:
 		frame_status = Frame(master)
 		frame_status.pack(side=LEFT)
 		self.label_status = Label(
-			frame_status, font="Arial 10", text="STATUS: OK.", fg='green',
+			frame_status, font="Arial 10", text=" ", fg='green',
 		)
 		self.label_status.pack(padx=5, pady=5)
 
-	def showIMG(self):
-		root = Tk()
-		root.title('Show Image')
+	def openFile(self):
+		self.top = Toplevel()
+		self.top.title('Open File')
+		self.top.resizable(False, False)
 
-		e = Entry(root, font="Arial 10")
-		e.pack(padx=5, pady=5)
-
-		img = Image.open('kvetina.jpg')
-		
-		self.button_show = Button(
-			root, text="Show Image", command=img.show
+		label_show = Label(
+			self.top, text="Enter the name of image:", font="Arial 10"
 		)
-		self.button_show.pack(padx=5, pady=5)
+		label_show.pack(padx=5, pady=5)
+
+		self.e_open = Entry(self.top, font="Arial 10")
+		self.e_open.pack(padx=5, pady=5)
+		
+		button_open = Button(
+			self.top, text="Open Image", command=self.openImage, font="Arial 10"
+		)
+		button_open.pack(padx=5, pady=5)
+
+		self.top.mainloop()
+
+	def openImage(self):
+		name = self.e_open.get()
+		exists = os.path.isfile(name)
+		if not name:
+			self.label_status.config(text='WRITE THE NAME OF FILE.', fg='red')
+			return
+		elif not exists:
+			self.label_status.config(text='FILE DOESN\'T EXIST.', fg='red')
+			return
+		else:
+			img = Image.open(name)
+			self.image_data = np.asarray(img)
+			img.show()
+			self.label_status.config(text='FILE IS OPEN.', fg='green')
+
+		self.top.destroy()
 
 def main():
 	root = Tk()
