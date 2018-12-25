@@ -112,10 +112,12 @@ class App:
 
 		self.e_open = Entry(self.top, font="Arial 12")
 		self.e_open.pack(padx=5, pady=5)
-		
+		self.e_open.focus()
+
 		button_open = Button(
 			self.top, text="Open Image", command=self.openImage, font="Arial 10"
 		)
+		button_open.bind('<Return>', self.openImage)
 		button_open.pack(padx=5, pady=5)
 
 		self.top.mainloop()
@@ -149,10 +151,12 @@ class App:
 
 		self.e_save = Entry(self.top, font="Arial 12")
 		self.e_save.pack(padx=5, pady=5)
-		
+		self.e_save.focus()
+
 		button_save = Button(
 			self.top, text="Save Image", command=self.saveImage, font="Arial 10"
 		)
+		button_save.bind('<Return>', self.saveImage)
 		button_save.pack(padx=5, pady=5)
 
 		self.top.mainloop()
@@ -216,6 +220,7 @@ class App:
 		self.image_data[ self.image_data > 255 ] = 255
 		self.image_data = (self.image_data - 0.5).astype(dtype=np.uint8)
 		self.label_status.config(text='BRIGHTNESS WAS INCREASED.', fg='green')
+
 
 def main():
 	root = Tk()
