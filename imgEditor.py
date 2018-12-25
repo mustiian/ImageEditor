@@ -16,7 +16,7 @@ class App:
 
 		''' FILE MENU BAR '''
 		filemenu = Menu(menubar, tearoff=0)
-		filemenu.add_command(label="Save ...", command=master.quit)
+		filemenu.add_command(label="Save ...", command=self.saveFile)
 		filemenu.add_command(label="Open ...", command=self.openFile)
 		filemenu.add_command(label="Exit", command=master.quit) 
 		menubar.add_cascade(label="File", menu=filemenu)
@@ -105,7 +105,7 @@ class App:
 		)
 		label_show.pack(padx=5, pady=5)
 
-		self.e_open = Entry(self.top, font="Arial 10")
+		self.e_open = Entry(self.top, font="Arial 12")
 		self.e_open.pack(padx=5, pady=5)
 		
 		button_open = Button(
@@ -122,7 +122,7 @@ class App:
 			self.label_status.config(text='WRITE THE NAME OF FILE.', fg='red')
 			return
 		elif not exists:
-			self.label_status.config(text='FILE DOESN\'T EXIST.', fg='red')
+			self.label_status.config(text='FILE DOESN\'T EXISTS.', fg='red')
 			return
 		else:
 			img = Image.open(name)
@@ -130,6 +130,33 @@ class App:
 			img.show()
 			self.label_status.config(text='FILE IS OPEN.', fg='green')
 
+		self.top.destroy()
+
+	def saveFile(self):
+		self.top = Toplevel()
+		self.top.title('Save File')
+		self.top.resizable(False, False)
+
+		label_show = Label(
+			self.top, text="Enter the name of image:", font="Arial 10"
+		)
+		label_show.pack(padx=5, pady=5)
+
+		self.e_save = Entry(self.top, font="Arial 12")
+		self.e_save.pack(padx=5, pady=5)
+		
+		button_save = Button(
+			self.top, text="Save Image", command=self.saveImage, font="Arial 10"
+		)
+		button_save.pack(padx=5, pady=5)
+
+		self.top.mainloop()
+
+	def saveImage(self):
+		name = self.e_save.get()
+		out = Image.fromarray(self.image_data, 'RGB')
+		out.save(name)
+		self.label_status.config(text='IMAGE IS SAVE.', fg='green')
 		self.top.destroy()
 
 def main():
