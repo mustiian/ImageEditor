@@ -5,4 +5,4 @@
 2. Open image ( File -> Open )
 3. Enjoy the program! 
 
-If you want to see changes after some commands, press 'Show image'
+If you want to see changes after some commands, press 'Show image'.
