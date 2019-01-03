@@ -5,5 +5,5 @@
 2. Open image ( File -> Open )
 3. Enjoy the program! 
 
-If you want to see changes after some commands, press 'Show image'.
-For testing you can try 'test.jpg'.
+If you want to see changes after commands, press 'Show image'.
+For testing you can try my image: 'test.jpg'.
